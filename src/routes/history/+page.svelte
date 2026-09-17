@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Outcome } from "$lib/api";
+  import type { Outcome, Trigger } from "$lib/api";
   import { fetchRuns } from "$lib/api";
   import { formatRelative } from "$lib/format";
   import { createPoll, createTicker } from "$lib/poll.svelte";
@@ -12,15 +12,21 @@
   const LIMITS = [50, 100, 200, 500] as const;
 
   const OUTCOMES: readonly Outcome[] = ["success", "failure", "timeout", "skipped"];
+  const TRIGGERS: readonly Trigger[] = ["scheduled", "manual"];
 
   const runs = createPoll((signal) => fetchRuns(undefined, limit, signal));
   const ticker = createTicker();
 
   let limit = $state(100);
   let outcome = $state<Outcome | "all">("all");
+  let trigger = $state<Trigger | "all">("all");
 
   const all = $derived(runs.data ?? []);
-  const shown = $derived(outcome === "all" ? all : all.filter((run) => run.outcome === outcome));
+  const shown = $derived(
+    all
+      .filter((run) => outcome === "all" || run.outcome === outcome)
+      .filter((run) => trigger === "all" || run.trigger === trigger)
+  );
 
   $effect(() => ticker.start());
 
@@ -45,6 +51,22 @@
         class:active={outcome === option}
         disabled={all.every((run) => run.outcome !== option)}
         onclick={() => (outcome = option)}
+      >
+        {option}
+      </button>
+    {/each}
+  </div>
+
+  <div class="filters">
+    <button type="button" class:active={trigger === "all"} onclick={() => (trigger = "all")}>
+      any trigger
+    </button>
+    {#each TRIGGERS as option (option)}
+      <button
+        type="button"
+        class:active={trigger === option}
+        disabled={all.every((run) => run.trigger !== option)}
+        onclick={() => (trigger = option)}
       >
         {option}
       </button>

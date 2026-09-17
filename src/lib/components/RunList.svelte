@@ -6,6 +6,7 @@
   import { TextMorph } from "torph/svelte";
 
   import OutcomeTag from "$lib/components/OutcomeTag.svelte";
+  import Tag from "$lib/components/Tag.svelte";
 
   type Props = {
     runs: RunRecord[];
@@ -29,6 +30,10 @@
       <li>
         <div class="head">
           <OutcomeTag outcome={run.outcome} />
+
+          {#if run.trigger === "manual"}
+            <Tag color="var(--idle)">manual</Tag>
+          {/if}
 
           {#if showJob}
             <a class="job" href={resolve("/job/[name]", { name: run.job })}>{run.job}</a>

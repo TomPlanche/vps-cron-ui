@@ -31,6 +31,9 @@ export const API_BASE = /^[^/]+\.[^/]+$/.test(configured) ? `https://${configure
 /** How a single run ended. Matches `Outcome` in `src/job.rs`. */
 export type Outcome = "success" | "failure" | "timeout" | "skipped";
 
+/** What started a run. Matches `Trigger` in `src/job.rs`. */
+export type Trigger = "scheduled" | "manual";
+
 /** A completed run, as stored in the history. */
 export type RunRecord = {
   /** Name of the job that ran. */
@@ -43,6 +46,8 @@ export type RunRecord = {
   duration_ms: number;
   /** How the run ended. */
   outcome: Outcome;
+  /** What started this run. */
+  trigger: Trigger;
   /** Single-line summary, or the error message for a failed run. */
   summary: string;
   /** Captured output tail, if the run produced any. */
